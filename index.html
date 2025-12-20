@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZULSTORE – Roblox Game Pass Store</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Special Gothic Expanded One',sans-serif}
+body{background:linear-gradient(to bottom,#1a1e2a,#1a1e2a);color:#fff;padding-top:60px}
+header{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(29, 46, 69, 0.6);backdrop-filter:blur(10px);padding:10px;text-align:center}
+header img{max-height:30px}
+.hero-banner{width:100%;object-fit:cover}
+.container{max-width:1100px;margin:30px auto;display:flex;flex-wrap:wrap;gap:30px;padding:0 20px}
+.left,.right{flex:1;min-width:300px}
+.rank-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-top:15px}
+.rank-card{background:#194d6c;padding:15px;border-radius:10px;text-align:center;cursor:pointer;transition:.3s;border:2px solid transparent}
+.rank-card:hover{transform:scale(1.05)}
+.rank-card.active{border-color:#1775c2;background:#2eccbf}
+.rank-card img{width:100%;border-radius:8px}
+.input-group{margin-top:20px}
+.input-group input,.input-group select{width:100%;padding:12px;border:none;border-radius:8px;background:#26384f;color:#fff}
+.total-box{background:#194d6c;padding:20px;border-radius:10px}
+.total-box span{color:#71d9f8;font-weight:bold}
+.order-button{margin-top:20px;display:block;text-align:center;padding:12px;background:#1775c2;border-radius:8px;color:white;text-decoration:none}
+footer{background:#194d6c;padding:15px;text-align:center;margin-top:40px}
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="logoheader.png">
+</header>
+
+<img src="bannerjoki.png" class="hero-banner">
+
+<div class="container">
+
+<!-- LEFT -->
+<div class="left">
+<h2>Pilih Game</h2>
+
+<div class="input-group">
+<select id="gameSelect">
+<option value="">-- Pilih Game Roblox --</option>
+<option value="Fish It">Fish It</option>
+<option value="The Forge">The Forge</option>
+</select>
+</div>
+
+<h2 style="margin-top:30px">Pilih Game Pass</h2>
+
+<div class="rank-grid" id="productGrid"></div>
+
+<div class="input-group">
+<h3>Username Roblox</h3>
+<input type="text" id="username" placeholder="Masukkan Username Roblox">
+<p id="usernameWarning" style="display:none;color:#f87171;font-size:13px;margin-top:6px;">
+  ⚠️ Username Roblox wajib diisi
+</p>
+
+</div>
+
+<div class="input-group">
+<h3>Jumlah</h3>
+<input type="number" id="qtyInput" value="1" min="1">
+</div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+<div class="total-box">
+<h3>Ringkasan Pesanan</h3>
+<p>Game: <span id="summaryGame">-</span></p>
+<p>Game Pass: <span id="summaryProduct">-</span></p>
+<p>Harga: Rp <span id="summaryPrice">0</span></p>
+<p>Jumlah: <span id="summaryQty">1</span></p>
+<p>Total: <span id="summaryTotal">Rp 0</span></p>
+
+<a id="waButton" class="order-button" target="_blank">Pesan via WhatsApp</a>
+</div>
+</div>
+
+</div>
+
+<footer>
+<img src="logoheader.png" style="max-height:20px"><br>
+<p style="font-size:14px;color:#9ca3af">© 2025 ZULSTORE – Roblox Game Pass</p>
+</footer>
+
+<script>
+const products = {
+  "Fish It": [
+    { name: "Small Luck", price: 4000, img: "20251123-0705-7UCIRPY26ASV9.webp" },
+    { name: "Extra Luck", price: 23500, img: "20251123-0706-1H2WLD4UT1A8K.webp" },
+    { name: "Advanced Luck", price: 23500, img: "20251123-0707-X044ZBQXU1PYQ.webp" },
+    { name: "VIP + Luck", price: 43000, img: "20251123-0707-0WAT4QGX8VWL2.webp" },
+    { name: "Double XP", price: 18000, img: "20251123-0706-TS4XQX0LGXKZZ.webp" },
+    { name: "More Mutations", price: 28000, img: "20251123-0706-HW9R4IF7RZYHE.webp" },
+    { name: "Frozen Krampus Skin", price: 85000, img: "20251123-0707-0WAT4QGX8VWL2.png" }
+  ],
+  "The Forge": [
+    { name: "Double Storage", price: 4000, img: "20251130-0656-TVKCF01U7LJ81.webp" },
+    { name: "Fast Forge", price: 23500, img: "20251130-0654-2D7XCKRUN1ZJR.webp" },
+    { name: "Sell Anywhere", price: 23500, img: "20251130-0656-R27LL9Q2VOJ33.webp" },
+    { name: "Supporter", price: 43000, img: "20251130-0652-XELXT0RSVPOO9.webp" },
+    { name: "Better Forge", price: 18000, img: "20251130-0653-VUIAUTBWFHGBN.webp" },
+    { name: "Forge Anywhere", price: 28000, img: "20251130-0655-0JJC2N6DGF41L.webp" }
+  ]
+}
+
+const gameSelect = document.getElementById("gameSelect")
+const productGrid = document.getElementById("productGrid")
+const qtyInput = document.getElementById("qtyInput")
+const usernameInput = document.getElementById("username")
+const waButton = document.getElementById("waButton")
+const usernameWarning = document.getElementById("usernameWarning")
+
+let selectedGame = ""
+let selectedProducts = []
+
+gameSelect.addEventListener("change", () => {
+  selectedGame = gameSelect.value
+  productGrid.innerHTML = ""
+  selectedProducts = []
+  updateSummary()
+
+  if (!products[selectedGame]) return
+
+  products[selectedGame].forEach((p, i) => {
+    const div = document.createElement("div")
+    div.className = "rank-card"
+    div.innerHTML = `
+      <img src="${p.img}">
+      <h4>${p.name}</h4>
+      <p>Rp ${p.price.toLocaleString()}</p>
+    `
+    div.onclick = () => toggleProduct(i, div)
+    productGrid.appendChild(div)
+  })
+})
+
+function toggleProduct(index, element){
+  const product = products[selectedGame][index]
+  const exists = selectedProducts.find(p => p.name === product.name)
+
+  if (exists) {
+    selectedProducts = selectedProducts.filter(p => p.name !== product.name)
+    element.classList.remove("active")
+  } else {
+    selectedProducts.push(product)
+    element.classList.add("active")
+  }
+  updateSummary()
+}
+
+function updateSummary(){
+  const qty = parseInt(qtyInput.value) || 1
+  const username = usernameInput.value.trim()
+
+  document.getElementById("summaryGame").textContent = selectedGame || "-"
+
+  // ❌ belum pilih produk
+  if (selectedProducts.length === 0) {
+    resetSummary(qty)
+    return
+  }
+
+  // ❌ username kosong
+  if (!username) {
+    usernameWarning.style.display = "block"
+    waButton.href = "#"
+    waButton.style.opacity = "0.6"
+    waButton.style.pointerEvents = "none"
+  } else {
+    usernameWarning.style.display = "none"
+    waButton.style.opacity = "1"
+    waButton.style.pointerEvents = "auto"
+  }
+
+  const productNames = selectedProducts.map(p => `• ${p.name}`).join("<br>")
+  const subtotal = selectedProducts.reduce((sum, p) => sum + p.price, 0)
+  const totalPrice = subtotal * qty
+
+  document.getElementById("summaryProduct").innerHTML = productNames
+  document.getElementById("summaryPrice").textContent = subtotal.toLocaleString()
+  document.getElementById("summaryQty").textContent = qty
+  document.getElementById("summaryTotal").textContent =
+    "Rp " + totalPrice.toLocaleString()
+
+  if (username) {
+    const waList = selectedProducts
+      .map(p => `- ${p.name} (Rp ${p.price.toLocaleString()})`)
+      .join("\n")
+
+    const message =
+`Halo admin, saya ingin membeli Game Pass Roblox:
+
+🎮 Game: ${selectedGame}
+👤 Username Roblox: ${username}
+
+🛒 Game Pass:
+${waList}
+
+📦 Jumlah: ${qty}
+💰 Total: Rp ${totalPrice.toLocaleString()}`
+
+    waButton.href =
+      "https://wa.me/6285381684474?text=" + encodeURIComponent(message)
+  }
+}
+
+function resetSummary(qty){
+  document.getElementById("summaryProduct").textContent = "-"
+  document.getElementById("summaryPrice").textContent = "0"
+  document.getElementById("summaryQty").textContent = qty
+  document.getElementById("summaryTotal").textContent = "Rp 0"
+  waButton.href = "#"
+  waButton.style.opacity = "0.6"
+  waButton.style.pointerEvents = "none"
+}
+
+qtyInput.addEventListener("input", updateSummary)
+usernameInput.addEventListener("input", updateSummary)
+</script>
+
+
+
+</body>
+</html>

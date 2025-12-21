@@ -98,7 +98,12 @@ footer{background:#194d6c;padding:15px;text-align:center;margin-top:40px}
 <div class="left">
 <h2>Pilih Game</h2>
 
+
 <div class="game-grid" id="gameGrid">
+  <div class="game-card" data-game="Robux">
+    <img src="robux.png">
+    <div class="game-title">Robux via Gamepass</div>
+  </div>
   <div class="game-card" data-game="Fish It">
     <img src="fishit.webp">
     <div class="game-title">Fish It</div>
@@ -110,8 +115,19 @@ footer{background:#194d6c;padding:15px;text-align:center;margin-top:40px}
   </div>
 </div>
 
+<div class="input-group" id="robuxInputBox" style="display:none">
+  <h3>Jumlah Robux</h3>
+  <input type="number" id="robuxInput" min="1" placeholder="Contoh: 100">
+  <p style="font-size:13px;color:#9ca3af;margin-top:6px">
+    ROBUX AKAN MASUK 5 HARI SETELAH DIKIRIM SELLER VIA GAMEPASS.
+  </p>
+    <p style="font-size:15px;color:#7df0ff;margin-top:6px">
+    Discount 7%
+  </p>
+</div>
 
-<h2 style="margin-top:30px">Pilih Game Pass</h2>
+<h2 id="gamepassTitle" style="margin-top:30px">Pilih Game Pass</h2>
+
 
 <div class="rank-grid" id="productGrid"></div>
 
@@ -152,6 +168,11 @@ footer{background:#194d6c;padding:15px;text-align:center;margin-top:40px}
 </footer>
 
 <script>
+const ROBUX_PRICE = 96
+const ROBUX_DISCOUNT = 0.07
+const ROBUX_TAX_RATE = 0.7 // after tax
+const gamepassTitle = document.getElementById("gamepassTitle")
+
 const products = {
   "Fish It": [
     { name: "Small Luck", price: 4000, img: "20251123-0705-7UCIRPY26ASV9.webp" },
@@ -183,6 +204,7 @@ const products = {
 const gameCards = document.querySelectorAll(".game-card")
 const productGrid = document.getElementById("productGrid")
 const qtyInput = document.getElementById("qtyInput")
+const qtyBox = qtyInput.parentElement
 const usernameInput = document.getElementById("username")
 const waButton = document.getElementById("waButton")
 const usernameWarning = document.getElementById("usernameWarning")
@@ -190,30 +212,52 @@ const usernameWarning = document.getElementById("usernameWarning")
 let selectedGame = ""
 let selectedProducts = []
 
+const robuxInputBox = document.getElementById("robuxInputBox")
+const robuxInput = document.getElementById("robuxInput")
+
 gameCards.forEach(card => {
   card.addEventListener("click", () => {
-    // reset active
     gameCards.forEach(c => c.classList.remove("active"))
     card.classList.add("active")
 
     selectedGame = card.dataset.game
+if (selectedGame === "Robux") {
+  gamepassTitle.style.display = "none"
+  qtyBox.style.display = "none"
+} else {
+  qtyBox.style.display = "block"
+}
+
     selectedProducts = []
     productGrid.innerHTML = ""
-    updateSummary()
 
-    products[selectedGame].forEach((p, i) => {
-      const div = document.createElement("div")
-      div.className = "rank-card"
-      div.innerHTML = `
-        <img src="${p.img}">
-        <h4>${p.name}</h4>
-        <p>Rp ${p.price.toLocaleString()}</p>
-      `
-      div.onclick = () => toggleProduct(i, div)
-      productGrid.appendChild(div)
-    })
+    if (selectedGame === "Robux") {
+  productGrid.style.display = "none"
+  gamepassTitle.style.display = "none"   // ⬅️ TAMBAH
+  robuxInputBox.style.display = "block"
+} else {
+  productGrid.style.display = "grid"
+  gamepassTitle.style.display = "block"  // ⬅️ TAMBAH
+  robuxInputBox.style.display = "none"
+
+
+      products[selectedGame].forEach((p, i) => {
+        const div = document.createElement("div")
+        div.className = "rank-card"
+        div.innerHTML = `
+          <img src="${p.img}">
+          <h4>${p.name}</h4>
+          <p>Rp ${p.price.toLocaleString()}</p>
+        `
+        div.onclick = () => toggleProduct(i, div)
+        productGrid.appendChild(div)
+      })
+    }
+
+    updateSummary()
   })
 })
+
 function toggleProduct(index, element){
   const product = products[selectedGame][index]
   const exists = selectedProducts.find(p => p.name === product.name)
@@ -232,24 +276,74 @@ function updateSummary(){
   const qty = parseInt(qtyInput.value) || 1
   const username = usernameInput.value.trim()
 
-  document.getElementById("summaryGame").textContent = selectedGame || "-"
-
-  // ❌ belum pilih produk
-  if (selectedProducts.length === 0) {
+  if (!selectedGame) {
     resetSummary(qty)
+    usernameWarning.style.display = "none"
     return
   }
 
-  // ❌ username kosong
+
+  document.getElementById("summaryGame").textContent = selectedGame || "-"
+
   if (!username) {
     usernameWarning.style.display = "block"
-    waButton.href = "#"
-    waButton.style.opacity = "0.6"
     waButton.style.pointerEvents = "none"
+    waButton.style.opacity = "0.6"
   } else {
     usernameWarning.style.display = "none"
-    waButton.style.opacity = "1"
     waButton.style.pointerEvents = "auto"
+    waButton.style.opacity = "1"
+  }
+
+  // ================= ROBUX =================
+if (selectedGame === "Robux") {
+
+  productGrid.style.display = "none"
+  robuxInputBox.style.display = "block"
+  qtyBox.style.display = "none"
+
+  const robux = parseInt(robuxInput.value)
+
+  if (!robux || robux <= 0) {
+    resetSummary(1)
+    return
+  }
+
+  const robuxAfterTax = Math.ceil(robux / ROBUX_TAX_RATE)
+  const basePrice = robuxAfterTax * ROBUX_PRICE
+  const finalPrice = Math.round(basePrice * (1 - ROBUX_DISCOUNT))
+
+  document.getElementById("summaryProduct").innerHTML =
+    `Robux ${robux} diterima<br><small>Gamepass ${robuxAfterTax} Robux</small>`
+
+  document.getElementById("summaryPrice").textContent =
+    basePrice.toLocaleString()
+
+  document.getElementById("summaryQty").textContent = "1"
+
+  document.getElementById("summaryTotal").textContent =
+    "Rp " + finalPrice.toLocaleString()
+
+  if (username) {
+    const message =
+`Halo admin, saya ingin membeli Robux:
+
+👤 Username Roblox: ${username}
+💎 Robux diterima: ${robux}
+📦 Gamepass: ${robuxAfterTax} Robux
+💰 Total: Rp ${finalPrice.toLocaleString()}`
+
+    waButton.href =
+      "https://wa.me/6289616734270?text=" + encodeURIComponent(message)
+  }
+
+  return
+}
+
+  // ================= GAMEPASS =================
+  if (selectedProducts.length === 0) {
+    resetSummary(qty)
+    return
   }
 
   const productNames = selectedProducts.map(p => `• ${p.name}`).join("<br>")
@@ -284,6 +378,7 @@ ${waList}
   }
 }
 
+
 function resetSummary(qty){
   document.getElementById("summaryProduct").textContent = "-"
   document.getElementById("summaryPrice").textContent = "0"
@@ -296,6 +391,8 @@ function resetSummary(qty){
 
 qtyInput.addEventListener("input", updateSummary)
 usernameInput.addEventListener("input", updateSummary)
+robuxInput.addEventListener("input", updateSummary)
+
 </script>
 
 
@@ -303,7 +400,6 @@ usernameInput.addEventListener("input", updateSummary)
 
 </body>
 </html>
-
 
 
 

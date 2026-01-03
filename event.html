@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Surat Misterius</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Special Gothic Expanded One',sans-serif;
+}
+
+body{
+  background:linear-gradient(to bottom,#1a1e2a,#1a1e2a);
+  color:#fff;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ================= POPUP SURAT ================= */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.surat-box{
+  background:#194d6c;
+  width:90%;
+  max-width:520px;
+  padding:30px;
+  border-radius:14px;
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+  animation:fadeIn .6s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:scale(.9)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.surat-box h2{
+  text-align:center;
+  margin-bottom:15px;
+  color:#7df0ff;
+}
+
+.surat-text{
+  font-size:14px;
+  line-height:1.7;
+  margin-bottom:15px;
+  color:#e5e7eb;
+}
+
+/* ================= GRID ================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  margin:15px 0;
+  text-align:center;
+  font-size:13px;
+}
+
+.grid div{
+  background:#26384f;
+  padding:8px 0;
+  border-radius:6px;
+}
+
+.grid .head{
+  background:#1775c2;
+  font-weight:bold;
+}
+
+/* ================= QUESTION ================= */
+.question{
+  margin-top:15px;
+  font-size:15px;
+  color:#71d9f8;
+}
+
+.code{
+  margin-top:8px;
+  font-size:14px;
+  color:#facc15;
+}
+
+/* ================= INPUT ================= */
+input{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#26384f;
+  color:white;
+  font-size:14px;
+}
+
+button{
+  width:100%;
+  margin-top:18px;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#1775c2;
+  color:white;
+  cursor:pointer;
+  transition:.3s;
+}
+
+button:hover{
+  background:#2eccbf;
+  color:#000;
+}
+
+/* ================= HASIL BENAR ================= */
+.success{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:linear-gradient(to bottom,#0f172a,#020617);
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:1000;
+}
+
+.success h1{
+  font-size:32px;
+  color:#2eccbf;
+  animation:glow 1.5s infinite alternate;
+}
+
+@keyframes glow{
+  from{text-shadow:0 0 10px #2eccbf}
+  to{text-shadow:0 0 25px #7df0ff}
+}
+
+.success p{
+  margin-top:15px;
+  color:#9ca3af;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= POPUP SURAT ================= -->
+<div class="popup" id="popup">
+  <div class="surat-box">
+    <h2>SURAT TERAKHIR</h2>
+
+    <div class="surat-text">
+      PEMBUNUH SUKA MEMAINKAN CATUR!.<br>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid">
+      <div class="head">1</div><div class="head">2</div><div class="head">3</div><div class="head">4</div><div class="head">5</div>
+
+      <div>A</div><div>?</div><div>K</div><div>?</div><div>U</div>
+      <div>?</div><div>G</div><div>?</div><div>Q</div><div>?</div>
+      <div>C</div><div>?</div><div>M</div><div>?</div><div>W</div>
+      <div>?</div><div>I</div><div>?</div><div>S</div><div>?</div>
+      <div>E</div><div>?</div><div>O</div><div>?</div><div>Y</div>
+    </div>
+
+    <div class="question">
+      Pecahkan kode berikut:
+    </div>
+
+    <div class="code">
+      (2,1) (1,1) (4,5) (2,3) (3,5) (3,4) (2,4)
+    </div>
+
+    <input type="text" id="answer" placeholder="Masukkan nama...">
+
+    <button onclick="checkAnswer()">Buka Kebenaran</button>
+  </div>
+</div>
+
+<!-- ================= HASIL ================= -->
+<div class="success" id="success">
+  <div>
+    <h1>SELAMAT ANDA ADALAH DETEKTIFNYA!</h1>
+    <p>Screenshot dan kirimkan ke DM OWNER!.</p>
+  </div>
+</div>
+
+<script>
+function checkAnswer(){
+  const input = document.getElementById("answer").value.trim().toLowerCase()
+
+  // JAWABAN FINAL
+  if(input === "fathoni"){
+    document.getElementById("popup").style.display = "none"
+    document.getElementById("success").style.display = "flex"
+  }else{
+    alert("Jawaban salah. Perhatikan kolom dan baris.")
+  }
+}
+</script>
+
+</body>
+</html>
